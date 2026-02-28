@@ -1,0 +1,304 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  line-height: 1.4;
+  font-weight: 400;
+  color: #111827;
+  background: #f8fafc;
+  --bg: #f8fafc;
+  --text: #111827;
+  --muted: #4b5563;
+  --panel-bg: #ffffff;
+  --border: #e5e7eb;
+  --input-border: #d1d5db;
+  --button-bg: #f3f4f6;
+  --button-bg-hover: #e5e7eb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  color: #e5e7eb;
+  background: #0b1220;
+  --bg: #0b1220;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --panel-bg: #111827;
+  --border: #1f2937;
+  --input-border: #374151;
+  --button-bg: #1f2937;
+  --button-bg-hover: #374151;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow: hidden;
+  color: var(--text);
+  background: var(--bg);
+}
+
+#app {
+  height: 100vh;
+}
+
+.layout {
+  height: 100%;
+}
+
+.stage,
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: min(46vw, 560px);
+  height: 100vh;
+  padding: 18px;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 12px;
+  border-left: 0;
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.stage-name label {
+  gap: 6px;
+}
+
+.stage-canvas-wrap {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.stage-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.panel {
+  margin-left: min(46vw, 560px);
+  height: 100vh;
+  overflow-y: auto;
+  padding: 16px;
+  border-right: 0;
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.panel h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.theme-toggle {
+  padding: 7px 10px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.panel p {
+  margin: 8px 0 16px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.subhead {
+  margin: 6px 0 10px;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.grid.two {
+  grid-template-columns: 1fr 1fr;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.86rem;
+  color: var(--text);
+}
+
+.label-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.lock-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.lock-inline input {
+  margin: 0;
+}
+
+.inline-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+
+.inline-field input {
+  width: 76px;
+}
+
+.hint {
+  margin: -2px 0 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.tiny-actions {
+  display: flex;
+  gap: 8px;
+  margin: -2px 0 12px;
+}
+
+.tiny-actions button {
+  padding: 6px 9px;
+  font-size: 0.78rem;
+}
+
+input,
+select,
+textarea,
+button,
+output {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.checks {
+  display: flex;
+  gap: 16px;
+  margin: 8px 0 14px;
+}
+
+.checks label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.palette-actions {
+  margin-bottom: 8px;
+}
+
+.status {
+  margin: 0 0 14px;
+  min-height: 20px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+button {
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: var(--button-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:hover {
+  background: var(--button-bg-hover);
+}
+
+#spriteCanvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+@media (max-width: 980px) {
+  body {
+    overflow: auto;
+  }
+
+  #app {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .stage {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stage-canvas-wrap {
+    min-height: 280px;
+  }
+
+  .panel {
+    margin-left: 0;
+    height: auto;
+    border-top: 0;
+    overflow: visible;
+  }
+}
