@@ -46,6 +46,10 @@ const THEME_STORAGE_KEY = 'pixel-monster-maker.theme.v1'
 const MODES: PaletteMode[] = ['random', 'warm', 'cool', 'pastel', 'monochrome']
 const BUILTIN_PALETTES: SavedPalette[] = [
   {
+    name: 'Berry Nebula',
+    colors: ['#6ceded', '#6cb9c9', '#6d85a5', '#6e5181', '#6f1d5c', '#4f1446', '#2e0a30', '#0d001a'],
+  },
+  {
     name: 'Apollo blue',
     colors: ['#172038', '#253a5e', '#3c5e8b', '#4f8fba', '#73bed3', '#a4dddb'],
   },
@@ -56,6 +60,14 @@ const BUILTIN_PALETTES: SavedPalette[] = [
   {
     name: 'Apollo violet',
     colors: ['#1e1d39', '#402751', '#7a367b', '#a23e8c', '#c65197', '#df84a5'],
+  },
+  {
+    name: 'Clouds',
+    colors: ['#fcb08c', '#ef9d7f', '#d6938a', '#b48d92', '#a597a1', '#8fa0bf', '#9aabc9', '#a5b7d4'],
+  },
+  {
+    name: 'SLSO',
+    colors: ['#0d2b45', '#203c56', '#544e68', '#8d697a', '#d08159', '#ffaa5e', '#ffd4a3', '#ffecd6'],
   },
 ]
 const BUILTIN_PALETTE_NAMES = new Set(BUILTIN_PALETTES.map((palette) => palette.name.toLowerCase()))
@@ -155,9 +167,9 @@ app.innerHTML = `
 
       <h2 class="subhead">Animation</h2>
       <div class="grid two">
-        <label>Frames <input id="frameCount" type="number" min="2" max="64" value="12" /></label>
-        <label>Move Amount <input id="movementAmount" type="number" min="0" max="2" step="0.05" value="0.4" /></label>
-        <label>Playback FPS <input id="playbackFps" type="number" min="1" max="60" step="1" value="12" /></label>
+        <label>Frames <input id="frameCount" type="number" min="2" max="64" value="16" /></label>
+        <label>Move Amount <input id="movementAmount" type="number" min="0" max="2" step="0.05" value="0.2" /></label>
+        <label>Playback FPS <input id="playbackFps" type="number" min="1" max="60" step="1" value="16" /></label>
         <label>Direction
           <select id="playbackDirection">
             <option value="forward">Forward</option>
@@ -255,9 +267,9 @@ const defaults: FormState = {
   brightness: 0,
   contrast: 0,
   jitter: 0,
-  frameCount: 12,
-  movementAmount: 0.4,
-  playbackFps: 12,
+  frameCount: 16,
+  movementAmount: 0.2,
+  playbackFps: 16,
   playbackDirection: 'forward',
   startFrame: 0,
   paletteSeed: null,
@@ -483,7 +495,7 @@ function readState(): FormState {
   const paletteSeed = paletteSeedInput.value.trim() === '' ? null : Number(paletteSeedInput.value)
   const frameCount = clampToRange(Number(frameCountInput.value), 2, 64, 8)
   const movementAmount = clampToRange(Number(movementAmountInput.value), 0, 2, 0.5)
-  const playbackFps = clampToRange(Number(playbackFpsInput.value), 1, 60, 12)
+  const playbackFps = clampToRange(Number(playbackFpsInput.value), 1, 60, 16)
   const playbackDirection = playbackDirectionInput.value === 'reverse' ? 'reverse' : 'forward'
   const startFrame = Math.max(0, Math.min(frameCount - 1, Math.floor(clampToRange(Number(startFrameInput.value), 0, 63, 0))))
 
@@ -607,7 +619,7 @@ function drawPreviewFrame(state: { width: number; height: number; animate: boole
 function readPlaybackState(): { width: number; height: number; animate: boolean; playbackFps: number } {
   const width = clampToRange(Number(widthInput.value), 8, 64, 24)
   const height = clampToRange(Number(heightInput.value), 8, 64, 24)
-  const playbackFps = clampToRange(Number(playbackFpsInput.value), 1, 60, 12)
+  const playbackFps = clampToRange(Number(playbackFpsInput.value), 1, 60, 16)
   return {
     width,
     height,
