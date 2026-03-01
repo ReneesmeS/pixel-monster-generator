@@ -43,6 +43,7 @@ type SavedPalette = {
 
 const SAVED_PALETTES_STORAGE_KEY = 'pixel-monster-maker.saved-palettes.v1'
 const THEME_STORAGE_KEY = 'pixel-monster-maker.theme.v1'
+const MAX_GRID_SIZE = 1024
 const MODES: PaletteMode[] = ['random', 'warm', 'cool', 'pastel', 'monochrome']
 const BUILTIN_PALETTES: SavedPalette[] = [
   {
@@ -108,8 +109,8 @@ app.innerHTML = `
       <h2 class="subhead">Basic</h2>
       <div class="grid two">
         <label>Seed <input id="seed" type="number" /></label>
-        <label>Width <input id="width" type="number" min="8" max="64" /></label>
-        <label>Height <input id="height" type="number" min="8" max="64" /></label>
+        <label>Width <input id="width" type="number" min="1" /></label>
+        <label>Height <input id="height" type="number" min="1" /></label>
         <label><span class="label-head">Symmetry <output id="symmetryValue">100</output></span><input id="symmetry" type="range" min="0" max="100" step="1" /></label>
       </div>
 
@@ -234,6 +235,7 @@ const resetPaletteControlsButton = document.querySelector<HTMLButtonElement>('#r
 const lockAllPaletteControlsButton = document.querySelector<HTMLButtonElement>('#lockAllPaletteControls')!
 const unlockAllPaletteControlsButton = document.querySelector<HTMLButtonElement>('#unlockAllPaletteControls')!
 const monsterNameInput = document.querySelector<HTMLInputElement>('#monsterName')!
+const stageCanvasWrap = document.querySelector<HTMLDivElement>('.stage-canvas-wrap')!
 const canvas = document.querySelector<HTMLCanvasElement>('#spriteCanvas')!
 
 const seedHistory: number[] = []
@@ -493,6 +495,8 @@ function parseCustomPalette(raw: string): string[] {
 
 function readState(): FormState {
   const paletteSeed = paletteSeedInput.value.trim() === '' ? null : Number(paletteSeedInput.value)
+  const width = Math.floor(clampToRange(Number(widthInput.value), 1, MAX_GRID_SIZE, 32))
+  const height = Math.floor(clampToRange(Number(heightInput.value), 1, MAX_GRID_SIZE, 32))
   const frameCount = clampToRange(Number(frameCountInput.value), 2, 64, 8)
   const movementAmount = clampToRange(Number(movementAmountInput.value), 0, 2, 0.5)
   const playbackFps = clampToRange(Number(playbackFpsInput.value), 1, 60, 16)
@@ -500,6 +504,8 @@ function readState(): FormState {
   const startFrame = Math.max(0, Math.min(frameCount - 1, Math.floor(clampToRange(Number(startFrameInput.value), 0, 63, 0))))
 
   frameCountInput.value = String(frameCount)
+  widthInput.value = String(width)
+  heightInput.value = String(height)
   startFrameInput.max = String(Math.max(0, frameCount - 1))
   startFrameInput.value = String(startFrame)
   movementAmountInput.value = String(movementAmount)
@@ -507,8 +513,8 @@ function readState(): FormState {
 
   return {
     seed: Number(seedInput.value),
-    width: Number(widthInput.value),
-    height: Number(heightInput.value),
+    width,
+    height,
     colors: Number(colorsInput.value),
     symmetry: Number(symmetryInput.value),
     outline: outlineInput.checked,
@@ -594,18 +600,42 @@ function rebuildAnimationCache(state: FormState): void {
   frameElapsedMs = 0
 }
 
+function computePreviewScale(width: number, height: number): number {
+  const safeWidth = Math.max(1, Math.floor(width))
+  const safeHeight = Math.max(1, Math.floor(height))
+
+  const bounds = stageCanvasWrap.getBoundingClientRect()
+  const fitWidth = Math.max(1, Math.floor(bounds.width) - 8)
+  const fitHeight = Math.max(1, Math.floor(bounds.height) - 8)
+  const fitScale = Math.min(fitWidth / safeWidth, fitHeight / safeHeight)
+
+  if (!Number.isFinite(fitScale) || fitScale <= 0) {
+    return 1
+  }
+
+  if (fitScale >= 1) {
+    return Math.max(1, Math.floor(fitScale))
+  }
+
+  return fitScale
+}
+
 function drawPreviewFrame(state: { width: number; height: number; animate: boolean }): void {
   if (cachedAnimationFrames.length === 0) {
     return
   }
 
-  const previewScale = 12
+  const width = Math.max(1, Math.floor(state.width))
+  const height = Math.max(1, Math.floor(state.height))
+  const previewScale = computePreviewScale(width, height)
   const frame = state.animate
     ? cachedAnimationFrames[previewFrameIndex % cachedAnimationFrames.length]
     : cachedAnimationFrames[0]
 
-  canvas.width = Math.max(1, Math.floor(state.width)) * previewScale
-  canvas.height = Math.max(1, Math.floor(state.height)) * previewScale
+  canvas.width = width
+  canvas.height = height
+  canvas.style.width = `${Math.max(1, Math.floor(width * previewScale))}px`
+  canvas.style.height = `${Math.max(1, Math.floor(height * previewScale))}px`
 
   const ctx = canvas.getContext('2d')
   if (!ctx) {
@@ -613,12 +643,12 @@ function drawPreviewFrame(state: { width: number; height: number; animate: boole
   }
   ctx.imageSmoothingEnabled = false
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  ctx.drawImage(frame, 0, 0, canvas.width, canvas.height)
+  ctx.drawImage(frame, 0, 0, width, height)
 }
 
 function readPlaybackState(): { width: number; height: number; animate: boolean; playbackFps: number } {
-  const width = clampToRange(Number(widthInput.value), 8, 64, 24)
-  const height = clampToRange(Number(heightInput.value), 8, 64, 24)
+  const width = Math.floor(clampToRange(Number(widthInput.value), 1, MAX_GRID_SIZE, 32))
+  const height = Math.floor(clampToRange(Number(heightInput.value), 1, MAX_GRID_SIZE, 32))
   const playbackFps = clampToRange(Number(playbackFpsInput.value), 1, 60, 16)
   return {
     width,
